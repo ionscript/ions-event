@@ -1,0 +1,27 @@
+{
+  "name": "ionscript/ions-event",
+  "description": "a component of event system",
+  "license": "GPL-3.0+",
+  "minimum-stability": "dev",
+  "authors": [
+    {
+      "name": "Serge Shportko",
+      "email": "ionscript.inc@gmail.com"
+    }
+  ],
+  "keywords": [
+    "ions",
+    "process"
+  ],
+  "homepage": "https://github.com/ionscript/ions-event",
+  "autoload": {
+    "psr-4": {
+      "Ions\\Event\\": "src/"
+    }
+  },
+  "require": {
+    "php": "^5.6 || ^7.0"
+  },
+  "autoload-dev": {},
+  "require-dev": {}
+}
