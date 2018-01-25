@@ -11,12 +11,13 @@ use ArrayObject;
 abstract class AbstractEvent
 {
     /**
-     * @var
+     * @var EventManager $events
      */
     protected $events;
 
     /**
      * @return EventManager
+     * @throws \InvalidArgumentException
      */
     public function getEventManager()
     {
@@ -30,7 +31,8 @@ abstract class AbstractEvent
     /**
      * @param $eventName
      * @param ArrayObject $args
-     * @return ResponseCollection
+     * @return Collection
+     * @throws \InvalidArgumentException|\RuntimeException
      */
     protected function triggerPre($eventName, ArrayObject $args)
     {
@@ -42,6 +44,7 @@ abstract class AbstractEvent
      * @param ArrayObject $args
      * @param $result
      * @return mixed|null
+     * @throws \InvalidArgumentException|\RuntimeException
      */
     protected function triggerPost($eventName, ArrayObject $args, & $result)
     {
@@ -57,6 +60,7 @@ abstract class AbstractEvent
      * @param $result
      * @param \Exception $exception
      * @return mixed|null
+     * @throws \InvalidArgumentException|\RuntimeException
      */
     protected function triggerException($eventName, ArrayObject $args, & $result, \Exception $exception)
     {

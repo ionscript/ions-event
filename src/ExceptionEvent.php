@@ -12,7 +12,7 @@ use Exception;
 class ExceptionEvent extends PostEvent
 {
     /**
-     * @var
+     * @var Exception $exception
      */
     protected $exception;
 
@@ -28,6 +28,7 @@ class ExceptionEvent extends PostEvent
      * @param ArrayObject $params
      * @param $result
      * @param Exception $exception
+     * @throws \InvalidArgumentException
      */
     public function __construct($name, $target, ArrayObject $params, & $result, Exception $exception)
     {

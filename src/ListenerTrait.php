@@ -6,7 +6,7 @@ namespace Ions\Event;
  * Class Listener
  * @package Ions\Event
  */
-abstract class Listener implements ListenerInterface
+trait ListenerTrait
 {
     /**
      * @var array
@@ -15,6 +15,7 @@ abstract class Listener implements ListenerInterface
 
     /**
      * @param EventManagerInterface $events
+     * @return void
      */
     public function detach(EventManagerInterface $events)
     {

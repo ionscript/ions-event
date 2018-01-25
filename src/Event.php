@@ -11,7 +11,7 @@ use ArrayAccess;
 class Event implements EventInterface
 {
     /**
-     * @var
+     * @var string $name
      */
     protected $name;
     /**
@@ -32,6 +32,7 @@ class Event implements EventInterface
      * @param null $name
      * @param null $target
      * @param null $params
+     * @throws \InvalidArgumentException
      */
     public function __construct($name = null, $target = null, $params = null)
     {
@@ -64,6 +65,7 @@ class Event implements EventInterface
 
     /**
      * @param $params
+     * @return void
      * @throws \InvalidArgumentException
      */
     public function setParams($params)
@@ -110,6 +112,7 @@ class Event implements EventInterface
 
     /**
      * @param $name
+     * @return void
      */
     public function setName($name)
     {
@@ -127,6 +130,7 @@ class Event implements EventInterface
     /**
      * @param $name
      * @param $value
+     * @return void
      */
     public function setParam($name, $value)
     {
@@ -139,6 +143,7 @@ class Event implements EventInterface
 
     /**
      * @param bool $flag
+     * @return void
      */
     public function stopPropagation($flag = true)
     {

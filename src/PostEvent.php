@@ -11,7 +11,7 @@ use ArrayObject;
 class PostEvent extends Event
 {
     /**
-     * @var
+     * @var mixed $result
      */
     protected $result;
 
@@ -21,6 +21,7 @@ class PostEvent extends Event
      * @param null $target
      * @param ArrayObject $params
      * @param $result
+     * @throws \InvalidArgumentException
      */
     public function __construct($name, $target, ArrayObject $params, & $result)
     {

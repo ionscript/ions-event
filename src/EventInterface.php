@@ -16,11 +16,6 @@ interface EventInterface
     /**
      * @return mixed
      */
-    public function getTarget();
-
-    /**
-     * @return mixed
-     */
     public function getParams();
 
     /**
@@ -35,12 +30,6 @@ interface EventInterface
      * @return mixed
      */
     public function setName($name);
-
-    /**
-     * @param $target
-     * @return mixed
-     */
-    public function setTarget($target);
 
     /**
      * @param $params

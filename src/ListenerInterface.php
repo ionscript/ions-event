@@ -2,8 +2,6 @@
 
 namespace Ions\Event;
 
-use Ions\Mvc\ServiceManager;
-
 /**
  * Interface ListenerInterface
  * @package Ions\Event
@@ -11,12 +9,11 @@ use Ions\Mvc\ServiceManager;
 interface ListenerInterface
 {
     /**
-     * @param ServiceManager $serviceManager
      * @param EventManagerInterface $events
      * @param int $priority
      * @return mixed
      */
-    public function attach(ServiceManager $serviceManager, EventManagerInterface $events, $priority = 1);
+    public function attach(EventManagerInterface $events, $priority = 1);
 
     /**
      * @param EventManagerInterface $events

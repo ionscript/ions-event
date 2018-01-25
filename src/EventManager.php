@@ -20,6 +20,7 @@ class EventManager implements EventManagerInterface
 
     /**
      * EventManager constructor.
+     * @throws \InvalidArgumentException
      */
     public function __construct()
     {
@@ -28,6 +29,7 @@ class EventManager implements EventManagerInterface
 
     /**
      * @param EventInterface $event
+     * @return void
      */
     public function setEvent(EventInterface $event)
     {
@@ -58,69 +60,67 @@ class EventManager implements EventManagerInterface
 
     /**
      * @param callable $listener
-     * @param null $eventName
+     * @param null $name
      * @param bool $force
      * @return bool
      * @throws \InvalidArgumentException
      */
-    public function detach(callable $listener, $eventName = null, $force = false)
+    public function detach(callable $listener, $name = null, $force = false)
     {
-        if (null === $eventName || ('*' === $eventName && !$force)) {
+        if (null === $name || ('*' === $name && !$force)) {
 
-            foreach (array_keys($this->events) as $name) {
-                $this->detach($listener, $name, true);
+            foreach (array_keys($this->events) as $value) {
+                $this->detach($listener, $value, true);
             }
 
             return true;
         }
 
-        if (!is_string($eventName)) {
+        if (!is_string($name)) {
             throw new \InvalidArgumentException(sprintf(
                 '%s expects a string for the event; received %s',
                 __METHOD__,
-                is_object($eventName) ? get_class($eventName) : gettype($eventName)
+                is_object($name) ? get_class($name) : gettype($name)
             ));
         }
 
-        if (!isset($this->events[$eventName])) {
+        if (!isset($this->events[$name])) {
             return false;
         }
 
-        foreach ($this->events[$eventName] as $priority => $listeners) {
-            foreach ($listeners[0] as $index => $evaluatedListener) {
+        foreach ($this->events[$name] as $priority => $listeners) {
+            foreach ($listeners as $index => $evaluatedListener) {
 
-                if ($evaluatedListener !== $listener) {
-                    continue;
-                }
+                unset($this->events[$name][$priority][$index]);
 
-                unset($this->events[$eventName][$priority][0][$index]);
-
-                if (empty($this->events[$eventName][$priority][0])) {
-                    unset($this->events[$eventName][$priority]);
+                if (empty($this->events[$name][$priority])) {
+                    unset($this->events[$name][$priority]);
                     break;
                 }
 
             }
         }
 
-        if (empty($this->events[$eventName])) {
-            unset($this->events[$eventName]);
+        if (empty($this->events[$name])) {
+            unset($this->events[$name]);
         }
 
         return true;
     }
 
     /**
-     * @param $eventName
+     * @param $name
      * @param null $target
      * @param array $argv
-     * @return ResponseCollection
+     * @return Collection
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
-    public function trigger($eventName, $target = null, array $argv = [])
+    public function trigger($name, $target = null, array $argv = [])
     {
         $event = clone $this->event;
 
-        $event->setName($eventName);
+        $event->setName($name);
 
         if ($target !== null) {
             $event->setTarget($target);
@@ -135,7 +135,8 @@ class EventManager implements EventManagerInterface
 
     /**
      * @param EventInterface $event
-     * @return ResponseCollection
+     * @return Collection
+     * @throws \RuntimeException
      */
     public function triggerEvent(EventInterface $event)
     {
@@ -145,14 +146,14 @@ class EventManager implements EventManagerInterface
     /**
      * @param EventInterface $event
      * @param callable|null $callback
-     * @return ResponseCollection
+     * @return Collection
      * @throws \RuntimeException
      */
     protected function triggerListeners(EventInterface $event, callable $callback = null)
     {
         $name = $event->getName();
 
-        if (empty($name)) {
+        if (!$name) {
             throw new \RuntimeException('Event is missing a name; cannot trigger!');
         }
 
@@ -160,7 +161,7 @@ class EventManager implements EventManagerInterface
             $listOfListenersByPriority = $this->events[$name];
 
             if (isset($this->events['*'])) {
-                foreach ($this->events['*'] as $priority => $listOfListeners) {
+                foreach ((array) $this->events['*'] as $priority => $listOfListeners) {
                     $listOfListenersByPriority[$priority][] = $listOfListeners[0];
                 }
             }
@@ -176,47 +177,46 @@ class EventManager implements EventManagerInterface
         $event->stopPropagation(false);
 
         // Execute listeners
-        $responses = new ResponseCollection();
+        $collection = new Collection();
 
         foreach ($listOfListenersByPriority as $listeners) {
             foreach ($listeners as $listener) {
-                $response = $listener($event);
-                $responses->push($response);
+                $result = $listener($event);
+                $collection->push($result);
 
-                if ($response !== null && !($response instanceof \Exception) && $event->propagationIsStopped()) {
-                    return $response;
+                if ($result !== null && !($result instanceof \Exception) && $event->propagationIsStopped()) {
+                    return $result;
                 }
 
-                // If the event was asked to stop propagating, do so
                 if ($event->propagationIsStopped()) {
-                    $responses->setStopped(true);
-                    return $responses;
+                    $collection->setStopped(true);
+                    return $collection;
                 }
 
-                // If the result causes our validation callback to return true,
-                // stop propagation
-                if ($callback && $callback($response)) {
-                    $responses->setStopped(true);
-                    return $responses;
+                if ($callback && $callback($result)) {
+                    $collection->setStopped(true);
+                    return $collection;
                 }
             }
         }
 
-        return $responses;
+        return $collection;
     }
 
     /**
      * @param callable $callback
-     * @param $eventName
+     * @param $name
      * @param null $target
      * @param array $argv
-     * @return ResponseCollection
+     * @return Collection
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
-    public function triggerUntil(callable $callback, $eventName, $target = null, array $argv = [])
+    public function triggerUntil(callable $callback, $name, $target = null, array $argv = [])
     {
         $event = clone $this->event;
 
-        $event->setName($eventName);
+        $event->setName($name);
 
         if ($target !== null) {
             $event->setTarget($target);
@@ -232,7 +232,8 @@ class EventManager implements EventManagerInterface
     /**
      * @param callable $callback
      * @param EventInterface $event
-     * @return ResponseCollection
+     * @return Collection
+     * @throws \RuntimeException
      */
     public function triggerEventUntil(callable $callback, EventInterface $event)
     {
@@ -241,6 +242,7 @@ class EventManager implements EventManagerInterface
 
     /**
      * @param $trigger
+     * @return void
      */
     public function clear($trigger)
     {

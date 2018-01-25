@@ -5,10 +5,10 @@ namespace Ions\Event;
 use SplStack;
 
 /**
- * Class ResponseCollection
+ * Class Collection
  * @package Ions\Event
  */
-class ResponseCollection extends SplStack
+class Collection extends SplStack
 {
     /**
      * @var bool
@@ -61,6 +61,7 @@ class ResponseCollection extends SplStack
                 return true;
             }
         }
+
         return false;
     }
 }

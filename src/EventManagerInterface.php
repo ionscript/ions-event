@@ -9,12 +9,12 @@ namespace Ions\Event;
 interface EventManagerInterface
 {
     /**
-     * @param $eventName
+     * @param $name
      * @param null $target
      * @param array $argv
      * @return mixed
      */
-    public function trigger($eventName, $target = null, array $argv = []);
+    public function trigger($name, $target = null, array $argv = []);
 
     /**
      * @param EventInterface $event
@@ -23,12 +23,12 @@ interface EventManagerInterface
     public function triggerEvent(EventInterface $event);
 
     /**
-     * @param $eventName
+     * @param $name
      * @param callable $listener
      * @param int $priority
      * @return mixed
      */
-    public function attach($eventName, callable $listener, $priority = 1);
+    public function attach($name, callable $listener, $priority = 1);
 
     /**
      * @param callable $listener
@@ -38,10 +38,10 @@ interface EventManagerInterface
     public function detach(callable $listener, $eventName = null);
 
     /**
-     * @param $eventName
+     * @param $name
      * @return mixed
      */
-    public function clear($eventName);
+    public function clear($name);
 
     /**
      * @param EventInterface $event
